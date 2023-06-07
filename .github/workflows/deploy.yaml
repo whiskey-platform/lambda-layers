@@ -20,7 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - id: pnpm-install
-        uses: mattwyskiel/sst-node-pnpm-setup@v1
+        uses: mattwyskiel/sst-node-pnpm-setup@v2
       - run: pnpm i
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
