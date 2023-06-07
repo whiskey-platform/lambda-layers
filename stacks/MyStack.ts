@@ -8,18 +8,24 @@ import { createWriteStream } from 'fs';
 import { promisify } from 'util';
 import { finished } from 'stream/promises';
 
+console.log('Fetching latest release of chromium');
 const releases = await github('GET /repos/{owner}/{repo}/releases', {
   owner: 'Sparticuz',
   repo: 'chromium',
 });
 const latestRelease = releases.data[0];
+console.log('Latest release of chromium is ' + latestRelease.name);
 const latestReleaseZip = latestRelease.assets.filter(
   (v) => v.name === `chromium-${latestRelease.name}-layer.zip`
 )[0];
-
+console.log('downloading Zip');
 await downloadFile(
   latestReleaseZip.browser_download_url,
   join('layers', 'chromium', latestReleaseZip.name)
+);
+console.log(
+  'successfully downloaded zip to ' +
+    join('layers', 'chromium', latestReleaseZip.name)
 );
 
 export function Layers({ stack }: StackContext) {
@@ -29,6 +35,7 @@ export function Layers({ stack }: StackContext) {
 
   stack.addOutputs({
     ChromiumLayer: chromium.layerVersionArn,
+    ChromiumVersion: latestRelease.name!,
   });
 }
 
