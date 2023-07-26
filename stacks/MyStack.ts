@@ -16,17 +16,14 @@ const releases = await github('GET /repos/{owner}/{repo}/releases', {
 const latestRelease = releases.data[0];
 console.log('Latest release of chromium is ' + latestRelease.name);
 const latestReleaseZip = latestRelease.assets.filter(
-  (v) => v.name === `chromium-${latestRelease.name}-layer.zip`
+  v => v.name === `chromium-${latestRelease.name}-layer.zip`
 )[0];
 console.log('downloading Zip');
 await downloadFile(
   latestReleaseZip.browser_download_url,
   join('layers', 'chromium', latestReleaseZip.name)
 );
-console.log(
-  'successfully downloaded zip to ' +
-    join('layers', 'chromium', latestReleaseZip.name)
-);
+console.log('successfully downloaded zip to ' + join('layers', 'chromium', latestReleaseZip.name));
 
 export function Layers({ stack }: StackContext) {
   const chromium = new LayerVersion(stack, 'ChromiumLayer', {
@@ -45,16 +42,13 @@ function pnpmInstall(path: string) {
 }
 
 // https://stackoverflow.com/questions/55374755/node-js-axios-download-file-stream-and-writefile
-export async function downloadFile(
-  fileUrl: string,
-  outputLocationPath: string
-): Promise<any> {
+export async function downloadFile(fileUrl: string, outputLocationPath: string): Promise<any> {
   const writer = createWriteStream(outputLocationPath);
   return axios({
     method: 'get',
     url: fileUrl,
     responseType: 'stream',
-  }).then((response) => {
+  }).then(response => {
     response.data.pipe(writer);
     return finished(writer); //this is a Promise
   });
