@@ -51,13 +51,15 @@ async function getLatestYTDLP() {
   console.log(
     'successfully downloaded binary to ' + join('layers', 'yt-dlp', 'bin', latestReleaseZip.name)
   );
+  console.log('downloading tar.xz of ffmpeg');
   await downloadFile(
     'https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz',
     join('layers', 'yt-dlp', 'build', 'ffmpeg.tar.xz')
   );
+  console.log('successfully downloaded tar.xz');
 
   tar.x({
-    file: 'ffmpeg.tar.xz',
+    file: join('layers', 'yt-dlp', 'build', 'ffmpeg.tar.xz'),
     cwd: join('layers', 'yt-dlp', 'build'),
   });
 
