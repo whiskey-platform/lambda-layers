@@ -60,17 +60,10 @@ async function getLatestYTDLP() {
 
   tar.x({
     file: join('layers', 'yt-dlp', 'build', 'ffmpeg.tar.xz'),
-    cwd: join('layers', 'yt-dlp', 'build'),
   });
 
-  await copyFile(
-    join('layers', 'yt-dlp', 'build', 'ffmpeg', 'ffmpeg'),
-    join('layers', 'yt-dlp', 'bin')
-  );
-  await copyFile(
-    join('layers', 'yt-dlp', 'build', 'ffmpeg', 'ffprobe'),
-    join('layers', 'yt-dlp', 'bin')
-  );
+  await copyFile(join('ffmpeg'), join('layers', 'yt-dlp', 'bin'));
+  await copyFile(join('ffprobe'), join('layers', 'yt-dlp', 'bin'));
 
   installYTDLPNode();
 
