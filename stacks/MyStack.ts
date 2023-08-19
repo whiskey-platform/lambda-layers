@@ -42,12 +42,7 @@ async function getLatestYTDLP() {
   });
   const latestRelease = releases.data[0];
   console.log('Latest release of yt-dlp is ' + latestRelease.name);
-  const latestReleaseZip = latestRelease.assets.filter(
-    v =>
-      v.name ===
-      `yt-dlp_linux
-`
-  )[0];
+  const latestReleaseZip = latestRelease.assets.filter(v => v.name === `yt-dlp_linux`)[0];
   console.log('downloading binary');
   await downloadFile(
     latestReleaseZip.browser_download_url,
