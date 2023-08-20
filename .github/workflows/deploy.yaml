@@ -47,6 +47,10 @@ jobs:
           latest: true
           fileName: 'ffprobe-linux-x64'
           out-file-path: 'layers/yt-dlp/bin'
+      - uses: vimtor/action-zip@v1
+        with:
+          files: bin/
+          dest: layers/yt-dlp/bin.zip
       - run: cd layers/yt-dlp && YOUTUBE_DL_SKIP_DOWNLOAD=true pnpm i
 
       - run: pnpm sst deploy --stage prod --outputs-file outputs.json
