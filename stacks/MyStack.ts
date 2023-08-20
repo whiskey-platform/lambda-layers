@@ -3,12 +3,13 @@ import { join } from 'path';
 import { StackContext } from 'sst/constructs';
 import { request as github } from '@octokit/request';
 import axios from 'axios';
-import { createWriteStream } from 'fs';
-import { finished } from 'stream/promises';
+import { createReadStream, createWriteStream } from 'fs';
+import { finished, pipeline } from 'stream/promises';
 import AdmZip from 'adm-zip';
 import { execSync } from 'child_process';
 import * as tar from 'tar';
 import { copyFile } from 'fs/promises';
+import { createDecompressor } from 'lzma-native';
 
 async function getLatestChromium() {
   console.log('Fetching latest release of chromium');
@@ -52,24 +53,13 @@ async function getLatestYTDLP() {
     'successfully downloaded binary to ' + join('layers', 'yt-dlp', 'bin', latestReleaseZip.name)
   );
   console.log('downloading tar.xz of ffmpeg');
-  await downloadFile(
-    'https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz',
-    join('layers', 'yt-dlp', 'build', 'ffmpeg.tar.xz')
-  );
-  console.log('successfully downloaded tar.xz');
-
-  tar.x({
-    file: join('layers', 'yt-dlp', 'build', 'ffmpeg.tar.xz'),
-  });
-
-  await copyFile(join('ffmpeg'), join('layers', 'yt-dlp', 'bin'));
-  await copyFile(join('ffprobe'), join('layers', 'yt-dlp', 'bin'));
+  downloadFFMPEG();
 
   installYTDLPNode();
 
   const zip = new AdmZip();
-  zip.addLocalFile(join('layers', 'yt-dlp', 'bin'));
-  await zip.writeZipPromise('layer.zip');
+  zip.addLocalFolder(join('layers', 'yt-dlp', 'bin'));
+  await zip.writeZipPromise('layers/yt-dlp/bin.zip');
   return { latestRelease };
 }
 const ytDLPZip = await getLatestYTDLP();
@@ -80,7 +70,7 @@ export function Layers({ stack }: StackContext) {
   });
 
   const ytDLP = new LayerVersion(stack, 'YTDLPLayer', {
-    code: Code.fromAsset(`layers/yt-dlp/layer.zip`),
+    code: Code.fromAsset(`layers/yt-dlp/bin.zip`),
   });
 
   stack.addOutputs({
@@ -96,8 +86,17 @@ export function Layers({ stack }: StackContext) {
 //   execSync('pnpm i');
 // }
 
+function downloadFFMPEG() {
+  execSync(
+    'cd layers/yt-dlp/build && curl https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz | tar x'
+  );
+  execSync(
+    'mv layers/yt-dlp/build/ffmpeg*/ffmpeg layers/yt-dlp/build/ffmpeg*/ffprobe layers/yt-dlp/bin'
+  );
+}
+
 function installYTDLPNode() {
-  execSync(`cd ${join(__dirname, 'layers', 'yt-dlp')}`);
+  execSync(`cd ${join('layers', 'yt-dlp')}`);
   execSync('YOUTUBE_DL_SKIP_DOWNLOAD=true pnpm i');
 }
 
