@@ -39,15 +39,13 @@ jobs:
         with:
           repository: 'eugeneware/ffmpeg-static'
           latest: true
-          fileName: 'ffmpeg-linux-x64.gz'
-          extract: true
+          fileName: 'ffmpeg-linux-x64'
           out-file-path: 'layers/yt-dlp/bin'
       - uses: robinraju/release-downloader@v1.8
         with:
           repository: 'eugeneware/ffmpeg-static'
           latest: true
-          fileName: 'ffprobe-linux-x64.gz'
-          extract: true
+          fileName: 'ffprobe-linux-x64'
           out-file-path: 'layers/yt-dlp/bin'
       - run: cd layers/yt-dlp && YOUTUBE_DL_SKIP_DOWNLOAD=true pnpm i
 
