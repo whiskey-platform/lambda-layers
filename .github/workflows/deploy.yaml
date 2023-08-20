@@ -28,6 +28,8 @@ jobs:
           aws-region: us-east-1
           role-to-assume: ${{secrets.AWS_ROLE_ARN}}
           role-session-name: lambda-layers
+
+      # yt-dlp
       - uses: robinraju/release-downloader@v1.8
         with:
           repository: 'yt-dlp/yt-dlp'
@@ -35,8 +37,8 @@ jobs:
           fileName: 'yt-dlp_linux'
           out-file-path: 'layers/yt-dlp/bin'
       - run:
-          cd layers/yt-dlp/build && curl
-          https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz | tar x
+          curl https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz | tar x
+        working-directory: layers/yt-dlp/build
       - run:
           mv layers/yt-dlp/build/ffmpeg*/ffmpeg layers/yt-dlp/build/ffmpeg*/ffprobe
           layers/yt-dlp/bin
